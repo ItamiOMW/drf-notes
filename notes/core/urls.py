@@ -17,14 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from accounts.views import RegisterAPI, VerifyEmailAPI, ResendVerificationCode
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include('notes.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
-    path('register/', RegisterAPI.as_view()),
-    path('verify-email/', VerifyEmailAPI.as_view()),
-    path('resend-email-verification/', ResendVerificationCode.as_view()),
+    path('accounts/', include('accounts.urls'))
 ]
