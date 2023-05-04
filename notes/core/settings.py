@@ -25,7 +25,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.240.90', '127.0.0.1']
 AUTH_USER_MODEL = 'accounts.User'
 
 # Application definition
@@ -137,5 +137,5 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    # 'EXCEPTION_HANDLER': 'notes.accounts.exception_handler.custom_exception_handler'
 }
-
