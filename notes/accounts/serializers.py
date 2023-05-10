@@ -1,109 +1,116 @@
 from django.contrib.auth.hashers import make_password
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from rest_framework import serializers
 
-from .exceptions import InvalidEmailException, UserAlreadyExistException, ShortPasswordException, \
-    InvalidVerificationCodeException, InvalidPasswordResetCodeException
+from .exceptions import *
 from .models import User
-
-
-# class CreateUserSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = User
-#         fields = ['email', 'password', 'is_active']
-#
-# def validate(self, attrs):
-#
-#     user = User.objects.filter(email=attrs['email']).first()
-#     if user is not None:
-#         raise UserAlreadyExistException
-#
-#     try:
-#         validate_email(attrs['email'])
-#     except ValidationError:
-#         raise InvalidEmailException
-#
-#     if len(attrs['password']) < 8:
-#         raise ShortPasswordException
-#
-#     return attrs
-#
-#     def create(self, validated_data):
-#         validated_data['password'] = make_password(validated_data['password'])
-#         return super(CreateUserSerializer, self).create(validated_data)
+from .validators import validate_verification_code, validate_password, validate_email_custom
 
 
 class RegisterSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField()
+    email = serializers.EmailField(validators=[validate_email_custom, ])
+    password = serializers.CharField(validators=[validate_password, ])
+
+    def validate(self, attrs):
+        user = User.objects.filter(email=attrs['email']).first()
+
+        if user is not None:
+            raise UserAlreadyExistException
+
+        return attrs
 
     def create(self, validated_data):
         email = validated_data['email']
         password = make_password(validated_data['password'])
-        user = User.objects.filter(email=email).first()
-
-        if user is not None and user.is_active == False:
-            user.delete()
-
         user = User.objects.create_user(email=email, password=password)
         return user
 
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(validators=[validate_email_custom, ])
+    password = serializers.CharField(validators=[])
+
     def validate(self, attrs):
+        email = attrs['email']
 
-        user = User.objects.filter(email=attrs['email']).first()
-        if user is not None and user.is_active == True:
-            raise UserAlreadyExistException
+        user = User.objects.filter(email=email).first()
 
-        try:
-            validate_email(attrs['email'])
-        except ValidationError:
-            raise InvalidEmailException
-
-        if len(attrs['password']) < 8:
-            raise ShortPasswordException
+        if user is not None and not user.is_active:
+            raise EmailNotVerifiedException
 
         return attrs
 
 
 class VerifyEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    verification_code = serializers.CharField()
+    email = serializers.EmailField(validators=[validate_email_custom, ])
+    verification_code = serializers.CharField(validators=[validate_verification_code, ])
 
     def validate(self, attrs):
-        try:
-            validate_email(attrs['email'])
-        except ValidationError:
-            raise InvalidEmailException
+        email = attrs['email']
+        verification_code = attrs['verification_code']
 
-        if len(attrs['verification_code']) != 6:
+        user = User.objects.filter(email=email).first()
+
+        if user is None:
+            raise UserDoesNotExistException
+
+        if user.is_active:
+            raise EmailAlreadyVerifiedException
+
+        if user.verification_code != verification_code:
             raise InvalidVerificationCodeException
+
+        return attrs
+
+
+
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    new_password = serializers.CharField()
-    password_reset_code = serializers.CharField()
+    email = serializers.EmailField(validators=[validate_email_custom, ])
+    new_password = serializers.CharField(validators=[validate_password, ])
+    password_reset_code = serializers.CharField(validators=[validate_verification_code, ])
 
     def validate(self, attrs):
-        try:
-            validate_email(attrs['email'])
-        except ValidationError:
-            raise InvalidEmailException
+        email = attrs['email']
+        password_reset_code = attrs['password_reset_code']
 
-        if len(attrs['verification_code']) != 6:
+        user = User.objects.filter(email=email).first()
+
+        if user is None:
+            raise UserDoesNotExistException
+
+        if user.password_reset_code != password_reset_code:
             raise InvalidPasswordResetCodeException
 
-        if len(attrs['password']) < 8:
-            raise ShortPasswordException
+        return attrs
 
 
-class EmailSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(validators=[validate_email_custom, ])
 
     def validate(self, attrs):
-        try:
-            validate_email(attrs['email'])
-        except ValidationError:
-            raise InvalidEmailException
+        email = attrs['email']
+
+        user = User.objects.filter(email=email).first()
+
+        if user is None:
+            raise UserDoesNotExistException
+
+        return attrs
+
+
+class ResendEmailVerificationCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(validators=[validate_email_custom, ])
+
+    def validate(self, attrs):
+        email = attrs['email']
+
+        user = User.objects.filter(email=email).first()
+
+        if user is None:
+            raise UserDoesNotExistException
+
+        if user.is_active:
+            raise EmailAlreadyVerifiedException
+
+        return attrs
