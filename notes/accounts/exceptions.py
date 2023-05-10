@@ -2,7 +2,7 @@ from rest_framework.exceptions import APIException
 
 
 class InvalidTokenException(APIException):
-    status_code = 400
+    status_code = 401
     default_code = '4001'
     default_detail = {'code': 4001, 'message': 'Invalid Token'}
 
@@ -63,7 +63,5 @@ class InvalidCredentialsException(APIException):
 
 class ShortPasswordException(APIException):
     status_code = 400
-    default_code = '4010'
-    default_detail = {'code': 4010, 'message': 'Password must be more than 8 symbols'}
-
-
+    default_code = '4011'
+    default_detail = {'code': 4011, 'message': 'Password must consist of at least 8 characters'}
