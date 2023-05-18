@@ -135,8 +135,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20,
+    'DATETIME_FORMAT': '%B %d, %Y',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    # 'EXCEPTION_HANDLER': 'notes.accounts.exception_handler.custom_exception_handler'
 }
