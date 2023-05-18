@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import AnonymousUser
 from rest_framework import status
@@ -88,6 +90,19 @@ class LoginAPI(APIView):
                 raise InvalidEmailOrPasswordException
         else:
             raise InvalidEmailOrPasswordException
+
+    def get(self, request):
+        user = User.objects.filter(email=request.user).first()
+        datetime_format = '%B %d, %Y'
+        data = {
+            'message': 'Get User successful',
+            'data': {
+                'email': user.email,
+                'date_created': datetime.strftime(user.date_joined, datetime_format),
+                'auth': str(request.auth)
+            }
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class LogoutAPI(APIView):
