@@ -1,2 +1,3 @@
 # drf-notes
-Django Notes REST API
+- NOTES CRUD REST API
+- [Mobile App](https://github.com/ItamiOWM/NotesWithRESTAPI)
