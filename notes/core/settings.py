@@ -84,7 +84,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': 'itamiomw.pythonanywhere.com',
-        'PORT': '8000',
+        'PORT': '5432',
     }
 }
 
