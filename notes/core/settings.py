@@ -83,8 +83,8 @@ DATABASES = {
         'NAME': 'notes',
         'USER': 'postgres',
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST': 'itamiomw.pythonanywhere.com',
+        'PORT': '8000',
     }
 }
 
