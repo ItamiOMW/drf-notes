@@ -77,14 +77,25 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'notes',
+#         'USER': 'postgres',
+#         'PASSWORD': config('DB_PASSWORD'),
+#         'HOST': 'itamiomw.mysql.pythonanywhere-services.com',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'notes',
-        'USER': 'postgres',
+        'USER': 'itamiomw',
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': 'itamiomw.pythonanywhere.com',
-        'PORT': '5432',
+        'HOST': 'itamiomw.mysql.pythonanywhere-services.com',
+        'PORT': '8000',
     }
 }
 
@@ -114,7 +125,6 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_TZ = True
-
 
 USE_I18N = True
 
